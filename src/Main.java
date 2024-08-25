@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,13 +13,38 @@ public class Main {
         testForEach(intArr);
         testSort(intArr);
 
-
         System.out.println("\n\nтесты DIYArrayList<String>");
         DIYArrayList<String> strArr = new DIYArrayList<String>();
         testAddStringElems(strArr);
         testRemoveElems(strArr);
         testForEach(strArr);
         testSort(strArr);
+
+        //*со зведочкой
+        System.out.println("\n\nтесты со звездочкой");
+        testCreateFromCollection();
+        testStaticSortAnotherCollection();
+    }
+
+    private static void testStaticSortAnotherCollection() {
+        List<Byte> listByte = new LinkedList<>();
+        for (int i = 0; i < 10; i++) {
+            Random random =new Random();
+            listByte.add((byte)random.nextInt(100));
+        }
+        DIYArrayList.bubleSortToHigh(listByte);
+        System.out.println(listByte.toString());
+        DIYArrayList.bubleSortToLow(listByte);
+        System.out.println(listByte.toString());
+    }
+
+    private static void testCreateFromCollection() {
+        List<Byte> listByte = new LinkedList<>();
+        for (int i = 0; i < 5; i++) {
+            listByte.add((byte)i);
+        }
+        DIYArrayList<Byte> myBiteList = new DIYArrayList<>(listByte);
+        myBiteList.showArray();
     }
 
     private static void testAddStringElems(DIYArrayList<String> strArr) {

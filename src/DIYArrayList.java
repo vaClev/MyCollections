@@ -9,6 +9,11 @@ public class DIYArrayList<T> implements Iterable<T> {
     private int nElms;
     private static final double MEMORY_EXPANSION_COEFFICIENT = 1.5;
 
+    public DIYArrayList(Collection<T> initCollection)
+    {
+        this(initCollection.size());
+        addAll(initCollection);
+    }
 
     public DIYArrayList() {
         this(10);
@@ -76,19 +81,19 @@ public class DIYArrayList<T> implements Iterable<T> {
     }
 
     public void sortBubbleToHigh() {
-        BubbleSort(true);
+        bubbleSort(true);
     }
 
     public void sortBubbleToLow() {
-        BubbleSort(false);
+        bubbleSort(false);
     }
 
-    private void BubbleSort(boolean toHigh) {
+    private void bubbleSort(boolean toHigh) {
         if (getElem(0) instanceof Comparable) {
             for (int i = 0; i < nElms; i++) {
                 boolean isSorted = true;
                 for (int j = 0; j < nElms - i - 1; j++) {
-                    int compareToRes = ((Comparable) getElem(j)).compareTo(array[j + 1]);
+                    int compareToRes = ((Comparable) (T)array[j]).compareTo(array[j + 1]);
                     if (compareToRes > 0 && toHigh || compareToRes < 0 && !toHigh) {
                         Object temp = array[j];
                         array[j] = array[j + 1];
@@ -143,6 +148,28 @@ public class DIYArrayList<T> implements Iterable<T> {
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             Iterator.super.forEachRemaining(action);
+        }
+    }
+
+    //Статические методы сортировки внешних коллекций
+    public static <T> void bubleSortToHigh(Collection<T> collection)
+    {
+        bubleSort(collection, true);
+    }
+    public static <T> void bubleSortToLow(Collection<T> collection)
+    {
+        bubleSort(collection, false);
+    }
+    private static <T> void bubleSort(Collection<T> collection, boolean toHigh)
+    {
+        if(collection.isEmpty() || collection.size()==1) return;
+        DIYArrayList<T> tempArr = new DIYArrayList<>(collection);
+        if(toHigh) tempArr.sortBubbleToHigh();
+        else  tempArr.sortBubbleToLow();
+
+        collection.clear();
+        for (T elem: tempArr) {
+            collection.add(elem);
         }
     }
 }
