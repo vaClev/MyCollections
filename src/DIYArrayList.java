@@ -3,11 +3,12 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-public class DIYArrayList<T> implements Iterable<T> {
+public class DIYArrayList<T> implements Iterable<T>, DIYCollection<T> {
     private Object[] array;
     private int size;
     private int nElms;
     private static final double MEMORY_EXPANSION_COEFFICIENT = 1.5;
+    private static final int DEFAULT_SIZE = 10;
 
     public DIYArrayList(Collection<T> initCollection)
     {
@@ -16,7 +17,7 @@ public class DIYArrayList<T> implements Iterable<T> {
     }
 
     public DIYArrayList() {
-        this(10);
+        this(DEFAULT_SIZE);
     }
 
     public DIYArrayList(int size) {
@@ -26,6 +27,11 @@ public class DIYArrayList<T> implements Iterable<T> {
         this.nElms = 0;
     }
 
+    public boolean isEmpty()
+    {
+        return nElms==0;
+    }
+    @Override
     public T getElem(int index) {
         return (T) array[index];
     }
@@ -39,25 +45,25 @@ public class DIYArrayList<T> implements Iterable<T> {
             addElem(elem);
         }
     }
-
-    private void increaseArraySize() {
-        int newSize = (int) Math.ceil(this.size * MEMORY_EXPANSION_COEFFICIENT);
-        Object[] newArr = new Object[newSize];
-        if (this.size >= 0) System.arraycopy(this.array, 0, newArr, 0, this.size); //копирование элементов массива
-        this.array = newArr;
-        this.size = newSize;
-    }
-
+    @Override
     public int size() {
         return nElms;
     }
-
+    @Override
     public void remove(int index) {
         if (index >= nElms || index < 0) throw new IllegalArgumentException();
         for (int i = index; i < nElms - 1; i++) {
             array[i] = array[i + 1];
         }
         nElms--;
+    }
+
+    private void increaseArraySize() {
+        int newSize = (int) Math.ceil(this.size * MEMORY_EXPANSION_COEFFICIENT);
+        Object[] newArr = new Object[newSize];
+        if (!isEmpty()) System.arraycopy(this.array, 0, newArr, 0, this.size); //копирование элементов массива
+        this.array = newArr;
+        this.size = newSize;
     }
 
     public void showArray() {
@@ -83,11 +89,9 @@ public class DIYArrayList<T> implements Iterable<T> {
     public void sortBubbleToHigh() {
         bubbleSort(true);
     }
-
     public void sortBubbleToLow() {
         bubbleSort(false);
     }
-
     private void bubbleSort(boolean toHigh) {
         if (getElem(0) instanceof Comparable) {
             for (int i = 0; i < nElms; i++) {

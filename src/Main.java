@@ -5,6 +5,21 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
+        myArrayListTests();
+
+        DIYLinkedList<Integer> integerDIYLinkedList = new DIYLinkedList<Integer>();
+        integerDIYLinkedList.addFirst(1);
+        integerDIYLinkedList.addFirst(2);
+        integerDIYLinkedList.addFirst(3);
+        integerDIYLinkedList.addLast(43);
+
+        for (Object elem:integerDIYLinkedList ) {
+            System.out.print(elem+"\t");
+        }
+        
+    }
+
+    public static void myArrayListTests() {
         System.out.println("\n\nТесты DIYArrayList<Integer>");
         DIYArrayList<Integer> intArr = new DIYArrayList<Integer>();
         testAddIntElems(intArr);
@@ -25,7 +40,6 @@ public class Main {
         testCreateFromCollection();
         testStaticSortAnotherCollection();
     }
-
     private static void testStaticSortAnotherCollection() {
         List<Byte> listByte = new LinkedList<>();
         for (int i = 0; i < 10; i++) {
@@ -37,7 +51,6 @@ public class Main {
         DIYArrayList.bubleSortToLow(listByte);
         System.out.println(listByte.toString());
     }
-
     private static void testCreateFromCollection() {
         List<Byte> listByte = new LinkedList<>();
         for (int i = 0; i < 5; i++) {
@@ -46,7 +59,6 @@ public class Main {
         DIYArrayList<Byte> myBiteList = new DIYArrayList<>(listByte);
         myBiteList.showArray();
     }
-
     private static void testAddStringElems(DIYArrayList<String> strArr) {
         strArr.addElem("hello");
         strArr.addElem("my");
