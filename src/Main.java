@@ -6,17 +6,7 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) {
         myArrayListTests();
-
-        DIYLinkedList<Integer> integerDIYLinkedList = new DIYLinkedList<Integer>();
-        integerDIYLinkedList.addFirst(1);
-        integerDIYLinkedList.addFirst(2);
-        integerDIYLinkedList.addFirst(3);
-        integerDIYLinkedList.addLast(43);
-
-        for (Object elem:integerDIYLinkedList ) {
-            System.out.print(elem+"\t");
-        }
-        
+        myLinkedListTests();
     }
 
     public static void myArrayListTests() {
@@ -43,8 +33,8 @@ public class Main {
     private static void testStaticSortAnotherCollection() {
         List<Byte> listByte = new LinkedList<>();
         for (int i = 0; i < 10; i++) {
-            Random random =new Random();
-            listByte.add((byte)random.nextInt(100));
+            Random random = new Random();
+            listByte.add((byte) random.nextInt(100));
         }
         DIYArrayList.bubleSortToHigh(listByte);
         System.out.println(listByte.toString());
@@ -54,7 +44,7 @@ public class Main {
     private static void testCreateFromCollection() {
         List<Byte> listByte = new LinkedList<>();
         for (int i = 0; i < 5; i++) {
-            listByte.add((byte)i);
+            listByte.add((byte) i);
         }
         DIYArrayList<Byte> myBiteList = new DIYArrayList<>(listByte);
         myBiteList.showArray();
@@ -67,7 +57,7 @@ public class Main {
         strArr.showArray();
     }
     private static void testAddAllCollectionInt(DIYArrayList<Integer> intArr) {
-        ArrayList<Integer> arrayList =new ArrayList<>();
+        ArrayList<Integer> arrayList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             arrayList.add(i);
         }
@@ -81,15 +71,14 @@ public class Main {
         arr.addElem(40);
         arr.showArray();
     }
-    private static <T> void testRemoveElems(DIYArrayList<T> diyArrayList)
-    {
+    private static <T> void testRemoveElems(DIYArrayList<T> diyArrayList) {
         diyArrayList.remove(1);
         diyArrayList.showArray();
     }
-    private static <T>void testForEach(DIYArrayList<T> arr) {
+    private static <T> void testForEach(DIYArrayList<T> arr) {
         System.out.println("вывод элементов intArr через forEach");
-        for (T elem: arr) {
-            System.out.print(elem+"\t");
+        for (T elem : arr) {
+            System.out.print(elem + "\t");
         }
         System.out.println();
     }
@@ -98,5 +87,40 @@ public class Main {
         arr.showArray();
         arr.sortBubbleToLow();
         arr.showArray();
+    }
+
+    public static void myLinkedListTests() {
+        System.out.println("\n\nDIYLinkedList<Integer> test:");
+        DIYLinkedList<Integer> integerDIYLinkedList = new DIYLinkedList<Integer>();
+        testAddElems(integerDIYLinkedList);
+        testRemoveElms(integerDIYLinkedList);
+        testAddAllElemsAndSort(integerDIYLinkedList);
+    }
+    private static void testAddElems(DIYLinkedList<Integer> integerDIYLinkedList) {
+        integerDIYLinkedList.addFirst(1);
+        integerDIYLinkedList.addFirst(2);
+        integerDIYLinkedList.addFirst(3);
+        integerDIYLinkedList.addLast(43);
+        for (Object elem : integerDIYLinkedList) {
+            System.out.print(elem + "\t");
+        }
+        System.out.println();
+        System.out.println("linkedList size: " + integerDIYLinkedList.size());
+    }
+    private static void testRemoveElms(DIYLinkedList<Integer> integerDIYLinkedList) {
+        integerDIYLinkedList.remove(3);
+        integerDIYLinkedList.remove(2);
+        integerDIYLinkedList.removeFirst();
+        integerDIYLinkedList.showList();
+    }
+    private static void testAddAllElemsAndSort(DIYLinkedList<Integer> integerDIYLinkedList) {
+        ArrayList<Integer> stdArr = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            stdArr.add(i*2);
+        }
+        integerDIYLinkedList.addAll(stdArr);
+        integerDIYLinkedList.showList();
+        integerDIYLinkedList.sort();
+        integerDIYLinkedList.showList();
     }
 }

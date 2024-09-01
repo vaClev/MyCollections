@@ -1,5 +1,6 @@
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
@@ -10,8 +11,7 @@ public class DIYArrayList<T> implements Iterable<T>, DIYCollection<T> {
     private static final double MEMORY_EXPANSION_COEFFICIENT = 1.5;
     private static final int DEFAULT_SIZE = 10;
 
-    public DIYArrayList(Collection<T> initCollection)
-    {
+    public DIYArrayList(Collection<T> initCollection) {
         this(initCollection.size());
         addAll(initCollection);
     }
@@ -27,28 +27,32 @@ public class DIYArrayList<T> implements Iterable<T>, DIYCollection<T> {
         this.nElms = 0;
     }
 
-    public boolean isEmpty()
-    {
-        return nElms==0;
+    public boolean isEmpty() {
+        return nElms == 0;
     }
+    private boolean isFull() {
+        return nElms == size;
+    }
+
     @Override
     public T getElem(int index) {
+        Objects.checkIndex(index, size());
         return (T) array[index];
     }
 
     public void addElem(T elem) {
-        if (nElms != size) {
-            array[nElms] = elem;
-            nElms++;
-        } else {
+        if (isFull()) {
             increaseArraySize();
-            addElem(elem);
         }
+        array[nElms] = elem;
+        nElms++;
     }
+
     @Override
     public int size() {
         return nElms;
     }
+
     @Override
     public void remove(int index) {
         if (index >= nElms || index < 0) throw new IllegalArgumentException();
@@ -89,15 +93,17 @@ public class DIYArrayList<T> implements Iterable<T>, DIYCollection<T> {
     public void sortBubbleToHigh() {
         bubbleSort(true);
     }
+
     public void sortBubbleToLow() {
         bubbleSort(false);
     }
+
     private void bubbleSort(boolean toHigh) {
         if (getElem(0) instanceof Comparable) {
             for (int i = 0; i < nElms; i++) {
                 boolean isSorted = true;
                 for (int j = 0; j < nElms - i - 1; j++) {
-                    int compareToRes = ((Comparable) (T)array[j]).compareTo(array[j + 1]);
+                    int compareToRes = ((Comparable) (T) array[j]).compareTo(array[j + 1]);
                     if (compareToRes > 0 && toHigh || compareToRes < 0 && !toHigh) {
                         Object temp = array[j];
                         array[j] = array[j + 1];
@@ -105,7 +111,7 @@ public class DIYArrayList<T> implements Iterable<T>, DIYCollection<T> {
                         isSorted = false;
                     }
                 }
-                if(isSorted) break;
+                if (isSorted) break;
             }
         } else {
             System.out.println("NOT COMPARABLE");
@@ -156,24 +162,24 @@ public class DIYArrayList<T> implements Iterable<T>, DIYCollection<T> {
     }
 
     //Статические методы сортировки внешних коллекций
-    public static <T> void bubleSortToHigh(Collection<T> collection)
-    {
+    public static <T> void bubleSortToHigh(Collection<T> collection) {
         bubleSort(collection, true);
     }
-    public static <T> void bubleSortToLow(Collection<T> collection)
-    {
+
+    public static <T> void bubleSortToLow(Collection<T> collection) {
         bubleSort(collection, false);
     }
-    private static <T> void bubleSort(Collection<T> collection, boolean toHigh)
-    {
-        if(collection.isEmpty() || collection.size()==1) return;
+
+    private static <T> void bubleSort(Collection<T> collection, boolean toHigh) {
+        if (collection.isEmpty() || collection.size() == 1) return;
         DIYArrayList<T> tempArr = new DIYArrayList<>(collection);
-        if(toHigh) tempArr.sortBubbleToHigh();
-        else  tempArr.sortBubbleToLow();
+        if (toHigh) tempArr.sortBubbleToHigh();
+        else tempArr.sortBubbleToLow();
 
         collection.clear();
-        for (T elem: tempArr) {
+        for (T elem : tempArr) {
             collection.add(elem);
         }
     }
+
 }
