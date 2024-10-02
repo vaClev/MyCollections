@@ -5,8 +5,9 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-        myArrayListTests();
-        myLinkedListTests();
+        //myArrayListTests();
+        //myLinkedListTests();
+        myHashMapTests();
     }
 
     public static void myArrayListTests() {
@@ -122,5 +123,13 @@ public class Main {
         integerDIYLinkedList.showList();
         integerDIYLinkedList.sort();
         integerDIYLinkedList.showList();
+    }
+
+    private static void myHashMapTests()
+    {
+        myHashMap<String, Integer> myMap = new myHashMap<>();
+        myMap.add("hello", 123);
+        Integer num = myMap.getValueByKey("hello");
+        System.out.print("hello - "+num);
     }
 }
