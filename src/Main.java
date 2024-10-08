@@ -129,7 +129,22 @@ public class Main {
     {
         myHashMap<String, Integer> myMap = new myHashMap<>();
         myMap.add("hello", 123);
-        Integer num = myMap.getValueByKey("hello");
-        System.out.print("hello - "+num);
+        myMap.add("hello2", 23);
+        myMap.add("hello3", 32);
+        myMap.add("random", 3654);
+        myMap.add("aston", 76);
+        myMap.add("hello", 89);
+        for (int i = 0; i < 50; i++) {
+            myMap.add("for i=0; i < 50:--"+i, i);
+        }
+        System.out.println("hello - "+myMap.getValueByKey("hello"));
+        System.out.println("hello2 - "+myMap.getValueByKey("hello2"));
+        System.out.println("hello3 - "+myMap.getValueByKey("hello3"));
+
+        //myMap.printAllElms();
+        myMap.deleteElemByKey("hello");
+        myMap.deleteElemByKey("for i=0; i < 50:--1");
+        System.out.println("hello - "+myMap.getValueByKey("hello"));
+        myMap.printAllElms();
     }
 }
