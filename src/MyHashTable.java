@@ -1,29 +1,29 @@
-class myHashMap<K extends Object, V> {
+class myHashMap<K, V> {
     private static final int DEFAULT_TABLE_SIZE = 16;
     private static final double OVERFLOW_COEFFICIENT = 0.75; //75%
     private static final double INCREASE_COEFFICIENT = 2.0;
-    private Node[] table;
+    private Node<K,V>[] table;
     private int filledBuckets;
 
     public myHashMap() {
         this(DEFAULT_TABLE_SIZE);
     }
 
+    @SuppressWarnings("unchecked")
     public myHashMap(int size) {
-        table = new Node[size];
+        table = (Node<K,V>[]) new Node[size];
         filledBuckets = 0;
     }
 
-    private class Node<K, V> {
+    private static class Node<K, V> {
         final int hashCode;
         final K key;
         V value;
         Node<K, V> next;
 
         Node(K key, V value, int hashCode) {
-            this.key = key;
+            this(key, hashCode);
             this.value = value;
-            this.hashCode = hashCode;
         }
 
         Node(K key, int hashCode) {
@@ -32,20 +32,14 @@ class myHashMap<K extends Object, V> {
         }
     }
 
-    public boolean add(K key, V value) {
+    public void add(K key, V value) {
         int hashCode = getHashCodeByKey(key);
         int indexInTable = getBucketNumber(hashCode);
-        System.out.println("hashCode" + hashCode + " index=" + indexInTable);
         Node<K, V> nodeToWrite = getNodeToWrite(hashCode, key, indexInTable);//поиск абсолютной копии или возврат нового Node для записи в него значения (value)
         nodeToWrite.value = value;
-        return true;
+        //System.out.println("hashCode" + hashCode + " index=" + indexInTable);
     }
-
-    private int getBucketNumber(int hashCode) {
-        return hashCode % table.length;
-    }
-
-    int getHashCodeByKey(K key) {
+    private int getHashCodeByKey(K key) {
         if (key != null) {
             int hashCode = key.hashCode();
             if (hashCode < 0) hashCode = -hashCode;
@@ -53,39 +47,41 @@ class myHashMap<K extends Object, V> {
         }
         return 0;
     }
-
+    private int getBucketNumber(int hashCode) {
+        return hashCode % table.length;
+    }
     private Node<K, V> getNodeToWrite(int hashCode, K key, int indexInTable) {
-        Node<K, V> nodeList = table[indexInTable];//указатель на первый элемент
+        Node<K, V> bucketFirstElem = table[indexInTable];//указатель на первый элемент
         Node<K, V> ourNode;
-        if (nodeList == null)//впервые добавляется элемент в этот bucket
+        if (bucketFirstElem == null)//впервые добавляется элемент в этот bucket
         {
             filledBuckets++;
             if (isOverflow()) {
                 increaseHashTableSize();
-                //сам себя запусти с новым параметрами
-                return getNodeToWrite(hashCode, key, hashCode % table.length);
+                return getNodeToWrite(hashCode, key, getBucketNumber(hashCode));//сам себя перезапусти
             }
             ourNode = new Node<>(key, hashCode);
         } else //в данном бакете уже есть элементы
         {
-            ourNode = getEqualNode(hashCode, key, nodeList);
+            ourNode = getEqualNode(hashCode, key, bucketFirstElem);
             if (ourNode == null) {
                 ourNode = new Node<>(key, hashCode);
-                ourNode.next = nodeList;
+                ourNode.next = bucketFirstElem;
             }
         }
         table[indexInTable] = ourNode;
         return ourNode;
     }
-
+    private boolean isOverflow() {
+        return (double) filledBuckets / table.length > OVERFLOW_COEFFICIENT;
+    }
     private void increaseHashTableSize() {
         System.out.println("Increasing HashTableSize");
         int newSize = (int) (table.length * INCREASE_COEFFICIENT);
         myHashMap<K, V> newHashMap = new myHashMap<>(newSize);
-
         //перемещение всех Node из this в newHashMap
-        for (int i = 0; i < table.length; i++) {
-            Node<K, V> pointer = table[i];
+        for (Node<K, V> bucket : table) {
+            Node<K, V> pointer = bucket;
             while (pointer != null) {
                 Node<K, V> next = pointer.next;
                 newHashMap.insertUnicNodeFromOldSizeHashMap(pointer);
@@ -102,7 +98,6 @@ class myHashMap<K extends Object, V> {
         if (nodeList == null) //bucket пуст
         {
             filledBuckets++;
-            System.out.println("Buckets in new table - " + filledBuckets);
             if (isOverflow()) {//это теоретически не должно происходить никогда, но вдруг
                 System.out.println("Переполнение достигнуто в момент расширения --- " +
                         "крайне неудачное совпадение хэшкодов");
@@ -113,17 +108,12 @@ class myHashMap<K extends Object, V> {
             oldNode.next = null; //теперь он никуда не показывает -- стираем ссылку на старый его next
         } else //bucket не пуст
         {
-            System.out.println("bucket не пуст" + filledBuckets);
             oldNode.next = nodeList;
         }
         table[indexInTable] = oldNode; //новый элемент всегда попадет в bucket на первую позицию
     }
-    private boolean isOverflow() {
-        return (double) filledBuckets / table.length > OVERFLOW_COEFFICIENT;
-    }
-
-    private Node<K, V> getEqualNode(int hashCode, K key, Node<K, V> nodeList) {
-        Node<K, V> pointer = nodeList;
+    private Node<K, V> getEqualNode(int hashCode, K key, Node<K, V> bucketFirstElem) {
+        Node<K, V> pointer = bucketFirstElem;
         while (pointer != null) {
             if (pointer.hashCode == hashCode && pointer.key.equals(key)) {
                 return pointer;
@@ -135,35 +125,33 @@ class myHashMap<K extends Object, V> {
 
     public V getValueByKey(K key) {
         int hashCode = getHashCodeByKey(key);
-        int indexInTable = hashCode % table.length;
+        int indexInTable = getBucketNumber(hashCode);
         Node<K, V> ourNode = getEqualNode(hashCode, key, table[indexInTable]);
         if (ourNode == null) {
             return null;
-        } else {
-            return ourNode.value;
         }
+        return ourNode.value;
     }
 
     public boolean deleteElemByKey(K key) {
         int hashCode = getHashCodeByKey(key);
-        int indexInTable = hashCode % table.length;
+        int indexInTable = getBucketNumber(hashCode);
         Node<K, V> ourNode = getEqualNode(hashCode, key, table[indexInTable]);
-        if (ourNode == null) {
+        if (ourNode == null) { //элемента с таким ключом нет в таблице
             return false;
         }
         if (ourNodeIsFirstInBucket(indexInTable, ourNode)) {
             table[indexInTable] = ourNode.next;
-        } else {
-            //итерируемся и ищем предыдущий элемент
-            myHashMap.Node pointer = table[indexInTable];
-            while (pointer.next != ourNode) {
-                pointer = pointer.next;
-            }
-            pointer.next = ourNode.next;
+            return true;
         }
+        //элемента с таким ключом не первый в бакете
+        Node<K, V> pointer = table[indexInTable];
+        while (pointer.next != ourNode) {
+            pointer = pointer.next;
+        }
+        pointer.next = ourNode.next;
         return true;
     }
-
     private boolean ourNodeIsFirstInBucket(int indexInTable, Node<K, V> ourNode) {
         return table[indexInTable] == ourNode;
     }
